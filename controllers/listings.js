@@ -1,6 +1,4 @@
 const Listing = require("../models/listing");
-const mapToken = process.env.MAP_TOKEN;
-const { geocoding } = require('@maptiler/client');
 
 
 module.exports.index = async (req, res) => {
@@ -30,28 +28,16 @@ module.exports.showListing = async (req, res) => {
 
 
 module.exports.createListing = async (req, res, next) => {
-    try{
-    const result = await geocoding.forward(req.body.listing.location, {
-        key: process.env.MAP_TOKEN,
-        limit: 1,
-      });
-      
-    console.log(result.features);
-      
 
     let url = req.file.path;
     let filename = req.file.filename;
+
     const newListing = new Listing(req.body.listing);
     newListing.owner = req.user._id;
     newListing.image = {url, filename};
     await newListing.save();
     req.flash("success", "New Listing Created!");
     res.redirect("/listings");
-
-    } catch (err) {
-        console.error(err);
-        next(err);
-    }
 };
 
 module.exports.renderEditForm = async (req, res) => {
